@@ -13,54 +13,54 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 메뉴 데이터를 저장할 배열
-let menus = [];
+// 메뉴 데이터 파일 경로
+const menuFilePath = path.join(__dirname, 'menus.json');
 
-// 메뉴 데이터를 파일로 저장
-const saveMenus = async () => {
-  await fs.writeJSON('menus.json', menus);
-};
-
-// 메뉴 데이터를 파일에서 불러오기
-const loadMenus = async () => {
+// 메뉴 목록 조회
+app.get('/api/menus', (req, res) => {
   try {
-    menus = await fs.readJSON('menus.json');
+    const menus = JSON.parse(fs.readFileSync(menuFilePath, 'utf8'));
+    res.json(menus);
   } catch (error) {
-    menus = [];
+    res.status(500).json({ error: '메뉴 데이터를 읽을 수 없습니다.' });
   }
-};
-
-// 메뉴 관련 API 라우트
-app.get('/api/menus', async (req, res) => {
-  await loadMenus();
-  res.json(menus);
 });
 
-app.post('/api/menus', async (req, res) => {
-  const { name, image } = req.body;
-  
-  // 메뉴 추가
-  const menu = {
-    id: Date.now(),
-    name,
-    image
-  };
-  
-  menus.push(menu);
-  await saveMenus();
-  
-  res.json(menu);
+// 메뉴 등록
+app.post('/api/menus', (req, res) => {
+  try {
+    const menus = JSON.parse(fs.readFileSync(menuFilePath, 'utf8'));
+    const newMenu = {
+      id: menus.length ? Math.max(...menus.map(m => m.id)) + 1 : 1,
+      name: req.body.name,
+      image: req.body.image
+    };
+    menus.push(newMenu);
+    fs.writeFileSync(menuFilePath, JSON.stringify(menus, null, 2));
+    res.json(newMenu);
+  } catch (error) {
+    res.status(500).json({ error: '메뉴를 등록할 수 없습니다.' });
+  }
 });
 
-app.delete('/api/menus/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-  menus = menus.filter(menu => menu.id !== id);
-  await saveMenus();
-  res.json({ message: 'Menu deleted successfully' });
+// 메뉴 삭제
+app.delete('/api/menus/:id', (req, res) => {
+  try {
+    const menus = JSON.parse(fs.readFileSync(menuFilePath, 'utf8'));
+    const updatedMenus = menus.filter(menu => menu.id !== parseInt(req.params.id));
+    fs.writeFileSync(menuFilePath, JSON.stringify(updatedMenus, null, 2));
+    res.json({ message: '메뉴가 삭제되었습니다.' });
+  } catch (error) {
+    res.status(500).json({ error: '메뉴를 삭제할 수 없습니다.' });
+  }
 });
 
-// 정적 파일 서빙
-app.use(express.static(path.join(__dirname, 'dist')));
+// Vercel 호스팅을 위한 설정
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
