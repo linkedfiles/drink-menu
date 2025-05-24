@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#1976d2" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Restaurant Menu</title>
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: Georgia, serif;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #f5ebe0;
+      }
+      nav {
+        padding: 1rem;
+        background-color: #f5ebe0;
+        color: #b8860b;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      nav a {
+        color: white;
+        text-decoration: none;
+        margin-right: 1rem;
+        font-weight: 500;
+        font-family: inherit;
+      }
+      @media (max-width: 768px) {
+        nav {
+          padding: 0.5rem;
+        }
+        nav a {
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.jsx"></script>
+  </body>
+</html>
