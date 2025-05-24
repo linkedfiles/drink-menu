@@ -7,35 +7,17 @@ function App() {
   const [menus, setMenus] = useState([]);
 
   useEffect(() => {
-    fetchMenus();
+    // 로컬 데이터 불러오기
+    const menusData = require('./data/menu.json');
+    setMenus(menusData.menus);
   }, []);
-
-  const fetchMenus = async () => {
-    try {
-      const response = await fetch('/api/menus');
-      if (response.ok) {
-        const data = await response.json();
-        setMenus(data);
-      }
-    } catch (error) {
-      console.error('Error fetching menus:', error);
-    }
-  };
 
   const handleDelete = async (id) => {
     if (!window.confirm('정말로 삭제하시겠습니까?')) return;
 
     try {
-      const response = await fetch(`/api/menus/${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (response.ok) {
-        setMenus(menus.filter(menu => menu.id !== id));
-        alert('메뉴가 성공적으로 삭제되었습니다!');
-      } else {
-        alert('메뉴 삭제에 실패했습니다.');
-      }
+      setMenus(menus.filter(menu => menu.id !== id));
+      alert('메뉴가 성공적으로 삭제되었습니다!');
     } catch (error) {
       console.error('Error deleting menu:', error);
       alert('메뉴 삭제 중 오류가 발생했습니다.');
